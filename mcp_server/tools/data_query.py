@@ -1,7 +1,7 @@
 """
-数据查询工具
+Data Query Tools
 
-实现P0核心的数据查询工具。
+Implements P0 core data query tools.
 """
 
 from typing import Dict, List, Optional
@@ -20,14 +20,14 @@ from ..utils.errors import MCPError
 
 
 class DataQueryTools:
-    """数据查询工具类"""
+    """Data Query Tools Class"""
 
     def __init__(self, project_root: str = None):
         """
-        初始化数据查询工具
+        Initialize data query tools
 
         Args:
-            project_root: 项目根目录
+            project_root: Project root directory
         """
         self.data_service = DataService(project_root)
 
@@ -38,15 +38,15 @@ class DataQueryTools:
         include_url: bool = False
     ) -> Dict:
         """
-        获取最新一批爬取的新闻数据
+        Get the latest batch of crawled news data
 
         Args:
-            platforms: 平台ID列表，如 ['zhihu', 'weibo']
-            limit: 返回条数限制，默认20
-            include_url: 是否包含URL链接，默认False（节省token）
+            platforms: Platform ID list, e.g. ['cnn', 'bbc']
+            limit: Return count limit, default 20
+            include_url: Whether to include URL links, default False (to save tokens)
 
         Returns:
-            新闻列表字典
+            News list dictionary
 
         Example:
             >>> tools = DataQueryTools()
@@ -55,11 +55,11 @@ class DataQueryTools:
             10
         """
         try:
-            # 参数验证
+            # Parameter validation
             platforms = validate_platforms(platforms)
             limit = validate_limit(limit, default=50)
 
-            # 获取数据
+            # Get data
             news_list = self.data_service.get_latest_news(
                 platforms=platforms,
                 limit=limit,
@@ -95,16 +95,16 @@ class DataQueryTools:
         limit: Optional[int] = None
     ) -> Dict:
         """
-        按关键词搜索历史新闻
+        Search historical news by keyword
 
         Args:
-            keyword: 搜索关键词（必需）
-            date_range: 日期范围，格式: {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}
-            platforms: 平台过滤列表
-            limit: 返回条数限制（可选，默认返回所有）
+            keyword: Search keyword (required)
+            date_range: Date range, format: {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}
+            platforms: Platform filter list
+            limit: Return count limit (optional, default returns all)
 
         Returns:
-            搜索结果字典
+            Search result dictionary
 
         Example:
             >>> tools = DataQueryTools()
@@ -116,7 +116,7 @@ class DataQueryTools:
             >>> print(result['total'])
         """
         try:
-            # 参数验证
+            # Parameter validation
             keyword = validate_keyword(keyword)
             date_range_tuple = validate_date_range(date_range)
             platforms = validate_platforms(platforms)
@@ -124,7 +124,7 @@ class DataQueryTools:
             if limit is not None:
                 limit = validate_limit(limit, default=100)
 
-            # 搜索数据
+            # Search data
             search_result = self.data_service.search_news_by_keyword(
                 keyword=keyword,
                 date_range=date_range_tuple,
@@ -157,18 +157,18 @@ class DataQueryTools:
         mode: Optional[str] = None
     ) -> Dict:
         """
-        获取个人关注词的新闻出现频率统计
+        Get news frequency statistics for personal keywords of interest
 
-        注意：本工具基于 config/frequency_words.txt 中的个人关注词列表进行统计，
-        而不是自动从新闻中提取热点话题。这是一个个人可定制的关注词列表，
-        用户可以根据自己的兴趣添加或删除关注词。
+        Note: This tool is based on the personal keywords list in config/frequency_words.txt for statistics,
+        rather than automatically extracting hot topics from news. This is a customizable keywords list,
+        users can add or remove keywords based on their interests.
 
         Args:
-            top_n: 返回TOP N关注词，默认10
-            mode: 模式 - daily(当日累计), current(最新一批), incremental(增量)
+            top_n: Return TOP N keywords, default 10
+            mode: Mode - daily (daily cumulative), current (latest batch), incremental (incremental)
 
         Returns:
-            关注词频率统计字典，包含每个关注词在新闻中出现的次数
+            Keyword frequency statistics dictionary, containing the number of times each keyword appears in news
 
         Example:
             >>> tools = DataQueryTools()
@@ -178,12 +178,12 @@ class DataQueryTools:
             >>> # 返回的是你在 frequency_words.txt 中设置的关注词的频率统计
         """
         try:
-            # 参数验证
+            # Parameter validation
             top_n = validate_top_n(top_n, default=10)
             valid_modes = ["daily", "current", "incremental"]
             mode = validate_mode(mode, valid_modes, default="current")
 
-            # 获取趋势话题
+            # Get trending topics
             trending_result = self.data_service.get_trending_topics(
                 top_n=top_n,
                 mode=mode
@@ -216,19 +216,19 @@ class DataQueryTools:
         include_url: bool = False
     ) -> Dict:
         """
-        按日期查询新闻，支持自然语言日期
+        Query news by date, supports natural language dates
 
         Args:
-            date_query: 日期查询字符串（可选，默认"今天"），支持：
-                - 相对日期：今天、昨天、前天、3天前、yesterday、3 days ago
-                - 星期：上周一、本周三、last monday、this friday
-                - 绝对日期：2025-10-10、10月10日、2025年10月10日
-            platforms: 平台ID列表，如 ['zhihu', 'weibo']
-            limit: 返回条数限制，默认50
-            include_url: 是否包含URL链接，默认False（节省token）
+            date_query: Date query string (optional, default "today"), supports:
+                - Relative dates: today, yesterday, 3 days ago
+                - Weekdays: last monday, this friday
+                - Absolute dates: 2025-10-10, October 10th, 2025-10-10
+            platforms: Platform ID list, e.g. ['cnn', 'bbc']
+            limit: Return count limit, default 50
+            include_url: Whether to include URL links, default False (to save tokens)
 
         Returns:
-            新闻列表字典
+            News list dictionary
 
         Example:
             >>> tools = DataQueryTools()
@@ -244,14 +244,14 @@ class DataQueryTools:
             20
         """
         try:
-            # 参数验证 - 默认今天
+            # Parameter validation - default today
             if date_query is None:
-                date_query = "今天"
+                date_query = "today"
             target_date = validate_date_query(date_query)
             platforms = validate_platforms(platforms)
             limit = validate_limit(limit, default=50)
 
-            # 获取数据
+            # Get data
             news_list = self.data_service.get_news_by_date(
                 target_date=target_date,
                 platforms=platforms,

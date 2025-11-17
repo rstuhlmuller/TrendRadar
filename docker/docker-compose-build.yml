@@ -11,7 +11,7 @@ services:
       - ../output:/app/output
 
     environment:
-      - TZ=Asia/Shanghai
+      - TZ=America/Los_Angeles
       # 核心配置
       - ENABLE_CRAWLER=${ENABLE_CRAWLER:-}
       - ENABLE_NOTIFICATION=${ENABLE_NOTIFICATION:-}

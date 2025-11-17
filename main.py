@@ -23,13 +23,13 @@ import yaml
 VERSION = "3.0.5"
 
 
-# === SMTP邮件配置 ===
+# === SMTP Email Configuration ===
 SMTP_CONFIGS = {
-    # Gmail（使用 STARTTLS）
+    # Gmail (using STARTTLS)
     "gmail.com": {"server": "smtp.gmail.com", "port": 587, "encryption": "TLS"},
-    # QQ邮箱（使用 SSL，更稳定）
+    # QQ Mail (using SSL, more stable)
     "qq.com": {"server": "smtp.qq.com", "port": 465, "encryption": "SSL"},
-    # Outlook（使用 STARTTLS）
+    # Outlook (using STARTTLS)
     "outlook.com": {
         "server": "smtp-mail.outlook.com",
         "port": 587,
@@ -41,19 +41,19 @@ SMTP_CONFIGS = {
         "encryption": "TLS",
     },
     "live.com": {"server": "smtp-mail.outlook.com", "port": 587, "encryption": "TLS"},
-    # 网易邮箱（使用 SSL，更稳定）
+    # NetEase Mail (using SSL, more stable)
     "163.com": {"server": "smtp.163.com", "port": 465, "encryption": "SSL"},
     "126.com": {"server": "smtp.126.com", "port": 465, "encryption": "SSL"},
-    # 新浪邮箱（使用 SSL）
+    # Sina Mail (using SSL)
     "sina.com": {"server": "smtp.sina.com", "port": 465, "encryption": "SSL"},
-    # 搜狐邮箱（使用 SSL）
+    # Sohu Mail (using SSL)
     "sohu.com": {"server": "smtp.sohu.com", "port": 465, "encryption": "SSL"},
 }
 
 
-# === 配置管理 ===
+# === Configuration Management ===
 def load_config():
-    """加载配置文件"""
+    """Load configuration file"""
     config_path = os.environ.get("CONFIG_PATH", "config/config.yaml")
 
     if not Path(config_path).exists():
@@ -64,7 +64,7 @@ def load_config():
 
     print(f"Configuration file loaded successfully: {config_path}")
 
-    # 构建配置
+    # Build configuration
     config = {
         "VERSION_CHECK_URL": config_data["app"]["version_check_url"],
         "SHOW_VERSION_UPDATE": config_data["app"]["show_version_update"],
@@ -131,7 +131,7 @@ def load_config():
         "PLATFORMS": config_data["platforms"],
     }
 
-    # 通知渠道配置（环境变量优先）
+    # Notification channel configuration (environment variables take priority)
     notification = config_data.get("notification", {})
     webhooks = notification.get("webhooks", {})
 
@@ -151,7 +151,7 @@ def load_config():
         "TELEGRAM_CHAT_ID", ""
     ).strip() or webhooks.get("telegram_chat_id", "")
 
-    # 邮件配置
+    # Email configuration
     config["EMAIL_FROM"] = os.environ.get("EMAIL_FROM", "").strip() or webhooks.get(
         "email_from", ""
     )
@@ -168,7 +168,7 @@ def load_config():
         "EMAIL_SMTP_PORT", ""
     ).strip() or webhooks.get("email_smtp_port", "")
 
-    # ntfy配置
+    # ntfy configuration
     config["NTFY_SERVER_URL"] = os.environ.get(
         "NTFY_SERVER_URL", "https://ntfy.sh"
     ).strip() or webhooks.get("ntfy_server_url", "https://ntfy.sh")
@@ -179,7 +179,7 @@ def load_config():
         "ntfy_token", ""
     )
 
-    # 输出配置来源信息
+    # Output configuration source information
     notification_sources = []
     if config["FEISHU_WEBHOOK_URL"]:
         source = "Environment Variable" if os.environ.get("FEISHU_WEBHOOK_URL") else "Config File"
@@ -218,24 +218,24 @@ print(f"TrendRadar v{VERSION} configuration loaded")
 print(f"Number of monitoring platforms: {len(CONFIG['PLATFORMS'])}")
 
 
-# === 工具函数 ===
-def get_beijing_time():
-    """获取北京时间"""
-    return datetime.now(pytz.timezone("Asia/Shanghai"))
+# === Utility Functions ===
+def get_pacific_time():
+    """Get US Pacific Time"""
+    return datetime.now(pytz.timezone("America/Los_Angeles"))
 
 
 def format_date_folder():
     """Format date folder name"""
-    return get_beijing_time().strftime("%Y-%m-%d")
+    return get_pacific_time().strftime("%Y-%m-%d")
 
 
 def format_time_filename():
     """Format time filename"""
-    return get_beijing_time().strftime("%H-%M")
+    return get_pacific_time().strftime("%H-%M")
 
 
 def clean_title(title: str) -> str:
-    """清理标题中的特殊字符"""
+    """Clean special characters from title"""
     if not isinstance(title, str):
         title = str(title)
     cleaned_title = title.replace("\n", " ").replace("\r", " ")
@@ -245,12 +245,12 @@ def clean_title(title: str) -> str:
 
 
 def ensure_directory_exists(directory: str):
-    """确保目录存在"""
+    """Ensure directory exists"""
     Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 def get_output_path(subfolder: str, filename: str) -> str:
-    """获取输出路径"""
+    """Get output path"""
     date_folder = format_date_folder()
     output_dir = Path("output") / date_folder / subfolder
     ensure_directory_exists(str(output_dir))
@@ -260,7 +260,7 @@ def get_output_path(subfolder: str, filename: str) -> str:
 def check_version_update(
     current_version: str, version_url: str, proxy_url: Optional[str] = None
 ) -> Tuple[bool, Optional[str]]:
-    """检查版本更新"""
+    """Check for version updates"""
     try:
         proxies = None
         if proxy_url:
@@ -280,7 +280,7 @@ def check_version_update(
         remote_version = response.text.strip()
         print(f"Current version: {current_version}, Remote version: {remote_version}")
 
-        # 比较版本
+        # Compare versions
         def parse_version(version_str):
             try:
                 parts = version_str.strip().split(".")
@@ -302,7 +302,7 @@ def check_version_update(
 
 
 def is_first_crawl_today() -> bool:
-    """检测是否是当天第一次爬取"""
+    """Detect if this is the first crawl today"""
     date_folder = format_date_folder()
     txt_dir = Path("output") / date_folder / "txt"
 
@@ -314,7 +314,7 @@ def is_first_crawl_today() -> bool:
 
 
 def html_escape(text: str) -> str:
-    """HTML转义"""
+    """HTML escape"""
     if not isinstance(text, str):
         text = str(text)
 
@@ -327,9 +327,9 @@ def html_escape(text: str) -> str:
     )
 
 
-# === 推送记录管理 ===
+# === Push Record Management ===
 class PushRecordManager:
-    """推送记录管理器"""
+    """Push record manager"""
 
     def __init__(self):
         self.record_dir = Path("output") / ".push_records"
@@ -337,24 +337,24 @@ class PushRecordManager:
         self.cleanup_old_records()
 
     def ensure_record_dir(self):
-        """确保记录目录存在"""
+        """Ensure record directory exists"""
         self.record_dir.mkdir(parents=True, exist_ok=True)
 
     def get_today_record_file(self) -> Path:
-        """获取今天的记录文件路径"""
-        today = get_beijing_time().strftime("%Y%m%d")
+        """Get today's record file path"""
+        today = get_pacific_time().strftime("%Y%m%d")
         return self.record_dir / f"push_record_{today}.json"
 
     def cleanup_old_records(self):
-        """清理过期的推送记录"""
+        """Clean up expired push records"""
         retention_days = CONFIG["PUSH_WINDOW"]["RECORD_RETENTION_DAYS"]
-        current_time = get_beijing_time()
+        current_time = get_pacific_time()
 
         for record_file in self.record_dir.glob("push_record_*.json"):
             try:
                 date_str = record_file.stem.replace("push_record_", "")
                 file_date = datetime.strptime(date_str, "%Y%m%d")
-                file_date = pytz.timezone("Asia/Shanghai").localize(file_date)
+                file_date = pytz.timezone("America/Los_Angeles").localize(file_date)
 
                 if (current_time - file_date).days > retention_days:
                     record_file.unlink()
@@ -363,7 +363,7 @@ class PushRecordManager:
                 print(f"Failed to clean record file {record_file}: {e}")
 
     def has_pushed_today(self) -> bool:
-        """检查今天是否已经推送过"""
+        """Check if already pushed today"""
         record_file = self.get_today_record_file()
 
         if not record_file.exists():
@@ -378,9 +378,9 @@ class PushRecordManager:
             return False
 
     def record_push(self, report_type: str):
-        """记录推送"""
+        """Record push"""
         record_file = self.get_today_record_file()
-        now = get_beijing_time()
+        now = get_pacific_time()
 
         record = {
             "pushed": True,
@@ -396,12 +396,12 @@ class PushRecordManager:
             print(f"Failed to save push records: {e}")
 
     def is_in_time_range(self, start_time: str, end_time: str) -> bool:
-        """检查当前时间是否在指定时间范围内"""
-        now = get_beijing_time()
+        """Check if current time is within specified time range"""
+        now = get_pacific_time()
         current_time = now.strftime("%H:%M")
     
         def normalize_time(time_str: str) -> str:
-            """将时间字符串标准化为 HH:MM 格式"""
+            """Normalize time string to HH:MM format"""
             try:
                 parts = time_str.strip().split(":")
                 if len(parts) != 2:
@@ -430,9 +430,9 @@ class PushRecordManager:
         return result
 
 
-# === 数据获取 ===
+# === Data Fetching ===
 class DataFetcher:
-    """数据获取器"""
+    """Data fetcher"""
 
     def __init__(self, proxy_url: Optional[str] = None):
         self.proxy_url = proxy_url
@@ -444,7 +444,7 @@ class DataFetcher:
         min_retry_wait: int = 3,
         max_retry_wait: int = 5,
     ) -> Tuple[Optional[str], str, str]:
-        """获取指定ID数据，支持重试"""
+        """Fetch data for specified ID, supports retry"""
         if isinstance(id_info, tuple):
             id_value, alias = id_info
         else:
@@ -502,7 +502,7 @@ class DataFetcher:
         ids_list: List[Union[str, Tuple[str, str]]],
         request_interval: int = CONFIG["REQUEST_INTERVAL"],
     ) -> Tuple[Dict, Dict, List]:
-        """爬取多个网站数据"""
+        """Crawl multiple website data"""
         results = {}
         id_to_name = {}
         failed_ids = []
@@ -552,21 +552,21 @@ class DataFetcher:
         return results, id_to_name, failed_ids
 
 
-# === 数据处理 ===
+# === Data Processing ===
 def save_titles_to_file(results: Dict, id_to_name: Dict, failed_ids: List) -> str:
-    """保存标题到文件"""
+    """Save titles to file"""
     file_path = get_output_path("txt", f"{format_time_filename()}.txt")
 
     with open(file_path, "w", encoding="utf-8") as f:
         for id_value, title_data in results.items():
-            # id | name 或 id
+            # id | name or id
             name = id_to_name.get(id_value)
             if name and name != id_value:
                 f.write(f"{id_value} | {name}\n")
             else:
                 f.write(f"{id_value}\n")
 
-            # 按排名排序标题
+            # Sort titles by rank
             sorted_titles = []
             for title, info in title_data.items():
                 cleaned_title = clean_title(title)
@@ -606,7 +606,7 @@ def save_titles_to_file(results: Dict, id_to_name: Dict, failed_ids: List) -> st
 def load_frequency_words(
     frequency_file: Optional[str] = None,
 ) -> Tuple[List[Dict], List[str]]:
-    """加载频率词配置"""
+    """Load frequency word configuration"""
     if frequency_file is None:
         frequency_file = os.environ.get(
             "FREQUENCY_WORDS_PATH", "config/frequency_words.txt"
@@ -658,7 +658,7 @@ def load_frequency_words(
 
 
 def parse_file_titles(file_path: Path) -> Tuple[Dict, Dict]:
-    """解析单个txt文件的标题数据，返回(titles_by_id, id_to_name)"""
+    """Parse title data from a single txt file, returns (titles_by_id, id_to_name)"""
     titles_by_id = {}
     id_to_name = {}
 
@@ -674,7 +674,7 @@ def parse_file_titles(file_path: Path) -> Tuple[Dict, Dict]:
             if len(lines) < 2:
                 continue
 
-            # id | name 或 id
+            # id | name or id
             header_line = lines[0].strip()
             if " | " in header_line:
                 parts = header_line.split(" | ", 1)
@@ -693,19 +693,19 @@ def parse_file_titles(file_path: Path) -> Tuple[Dict, Dict]:
                         title_part = line.strip()
                         rank = None
 
-                        # 提取排名
+                        # Extract rank
                         if ". " in title_part and title_part.split(". ")[0].isdigit():
                             rank_str, title_part = title_part.split(". ", 1)
                             rank = int(rank_str)
 
-                        # 提取 MOBILE URL
+                        # Extract MOBILE URL
                         mobile_url = ""
                         if " [MOBILE:" in title_part:
                             title_part, mobile_part = title_part.rsplit(" [MOBILE:", 1)
                             if mobile_part.endswith("]"):
                                 mobile_url = mobile_part[:-1]
 
-                        # 提取 URL
+                        # Extract URL
                         url = ""
                         if " [URL:" in title_part:
                             title_part, url_part = title_part.rsplit(" [URL:", 1)
@@ -730,7 +730,7 @@ def parse_file_titles(file_path: Path) -> Tuple[Dict, Dict]:
 def read_all_today_titles(
     current_platform_ids: Optional[List[str]] = None,
 ) -> Tuple[Dict, Dict, Dict]:
-    """读取当天所有标题文件，支持按当前监控平台过滤"""
+    """Read all title files for the day, supports filtering by currently monitored platforms"""
     date_folder = format_date_folder()
     txt_dir = Path("output") / date_folder / "txt"
 
@@ -778,7 +778,7 @@ def process_source_data(
     all_results: Dict,
     title_info: Dict,
 ) -> None:
-    """处理来源数据，合并重复标题"""
+    """Process source data, merge duplicate titles"""
     if source_id not in all_results:
         all_results[source_id] = title_data
 
@@ -845,7 +845,7 @@ def process_source_data(
 
 
 def detect_latest_new_titles(current_platform_ids: Optional[List[str]] = None) -> Dict:
-    """检测当日最新批次的新增标题，支持按当前监控平台过滤"""
+    """Detect newly added titles in the latest batch of the day, supports filtering by currently monitored platforms"""
     date_folder = format_date_folder()
     txt_dir = Path("output") / date_folder / "txt"
 
@@ -856,11 +856,11 @@ def detect_latest_new_titles(current_platform_ids: Optional[List[str]] = None) -
     if len(files) < 2:
         return {}
 
-    # 解析最新文件
+    # Parse latest file
     latest_file = files[-1]
     latest_titles, _ = parse_file_titles(latest_file)
 
-    # 如果指定了当前平台列表，过滤最新文件数据
+    # If current platform list is specified, filter latest file data
     if current_platform_ids is not None:
         filtered_latest_titles = {}
         for source_id, title_data in latest_titles.items():
@@ -868,12 +868,12 @@ def detect_latest_new_titles(current_platform_ids: Optional[List[str]] = None) -
                 filtered_latest_titles[source_id] = title_data
         latest_titles = filtered_latest_titles
 
-    # 汇总历史标题（按平台过滤）
+    # Aggregate historical titles (filtered by platform)
     historical_titles = {}
     for file_path in files[:-1]:
         historical_data, _ = parse_file_titles(file_path)
 
-        # 过滤历史数据
+        # Filter historical data
         if current_platform_ids is not None:
             filtered_historical_data = {}
             for source_id, title_data in historical_data.items():
@@ -887,7 +887,7 @@ def detect_latest_new_titles(current_platform_ids: Optional[List[str]] = None) -
             for title in titles_data.keys():
                 historical_titles[source_id].add(title)
 
-    # 找出新增标题
+    # Find newly added titles
     new_titles = {}
     for source_id, latest_source_titles in latest_titles.items():
         historical_set = historical_titles.get(source_id, set())
@@ -903,11 +903,11 @@ def detect_latest_new_titles(current_platform_ids: Optional[List[str]] = None) -
     return new_titles
 
 
-# === 统计和分析 ===
+# === Statistics and Analysis ===
 def calculate_news_weight(
     title_data: Dict, rank_threshold: int = CONFIG["RANK_THRESHOLD"]
 ) -> float:
-    """计算新闻权重，用于排序"""
+    """Calculate news weight, used for sorting"""
     ranks = title_data.get("ranks", [])
     if not ranks:
         return 0.0
@@ -915,7 +915,7 @@ def calculate_news_weight(
     count = title_data.get("count", len(ranks))
     weight_config = CONFIG["WEIGHT_CONFIG"]
 
-    # 排名权重：Σ(11 - min(rank, 10)) / 出现次数
+    # Rank weight: Σ(11 - min(rank, 10)) / occurrence count
     rank_scores = []
     for rank in ranks:
         score = 11 - min(rank, 10)
@@ -923,10 +923,10 @@ def calculate_news_weight(
 
     rank_weight = sum(rank_scores) / len(ranks) if ranks else 0
 
-    # 频次权重：min(出现次数, 10) × 10
+    # Frequency weight: min(occurrence count, 10) × 10
     frequency_weight = min(count, 10) * 10
 
-    # 热度加成：高排名次数 / 总出现次数 × 100
+    # Hotness bonus: high rank count / total occurrence count × 100
     high_rank_count = sum(1 for rank in ranks if rank <= rank_threshold)
     hotness_ratio = high_rank_count / len(ranks) if ranks else 0
     hotness_weight = hotness_ratio * 100
@@ -943,23 +943,23 @@ def calculate_news_weight(
 def matches_word_groups(
     title: str, word_groups: List[Dict], filter_words: List[str]
 ) -> bool:
-    """检查标题是否匹配词组规则"""
-    # 如果没有配置词组，则匹配所有标题（支持显示全部新闻）
+    """Check if title matches word group rules"""
+    # If no word groups configured, match all titles (supports showing all news)
     if not word_groups:
         return True
 
     title_lower = title.lower()
 
-    # 过滤词检查
+    # Filter word check
     if any(filter_word.lower() in title_lower for filter_word in filter_words):
         return False
 
-    # 词组匹配检查
+    # Word group match check
     for group in word_groups:
         required_words = group["required"]
         normal_words = group["normal"]
 
-        # 必须词检查
+        # Required word check
         if required_words:
             all_required_present = all(
                 req_word.lower() in title_lower for req_word in required_words
@@ -967,7 +967,7 @@ def matches_word_groups(
             if not all_required_present:
                 continue
 
-        # 普通词检查
+        # Normal word check
         if normal_words:
             any_normal_present = any(
                 normal_word.lower() in title_lower for normal_word in normal_words
@@ -981,7 +981,7 @@ def matches_word_groups(
 
 
 def format_time_display(first_time: str, last_time: str) -> str:
-    """格式化时间显示"""
+    """Format time display"""
     if not first_time:
         return ""
     if first_time == last_time or not last_time:
@@ -991,7 +991,7 @@ def format_time_display(first_time: str, last_time: str) -> str:
 
 
 def format_rank_display(ranks: List[int], rank_threshold: int, format_type: str) -> str:
-    """统一的排名格式化方法"""
+    """Unified rank formatting method"""
     if not ranks:
         return ""
 
@@ -1040,28 +1040,28 @@ def count_word_frequency(
     new_titles: Optional[Dict] = None,
     mode: str = "daily",
 ) -> Tuple[List[Dict], int]:
-    """统计词频，支持必须词、频率词、过滤词，并标记新增标题"""
+    """Count word frequency, supports required words, frequency words, filter words, and marks newly added titles"""
 
-    # 如果没有配置词组，创建一个包含所有新闻的虚拟词组
+    # If no word groups configured, create a virtual group containing all news
     if not word_groups:
         print("Frequency words configuration is empty, will show all news")
         word_groups = [{"required": [], "normal": [], "group_key": "All News"}]
-        filter_words = []  # 清空过滤词，显示所有新闻
+        filter_words = []  # Clear filter words, show all news
 
     is_first_today = is_first_crawl_today()
 
-    # 确定处理的数据源和新增标记逻辑
+    # Determine data source to process and new addition marking logic
     if mode == "incremental":
         if is_first_today:
-            # 增量模式 + 当天第一次：处理所有新闻，都标记为新增
+            # Incremental mode + first time today: process all news, all marked as new
             results_to_process = results
             all_news_are_new = True
         else:
-            # 增量模式 + 当天非第一次：只处理新增的新闻
+            # Incremental mode + not first time today: only process newly added news
             results_to_process = new_titles if new_titles else {}
             all_news_are_new = True
     elif mode == "current":
-        # current 模式：只处理当前时间批次的新闻，但统计信息来自全部历史
+        # Current mode: only process news from current time batch, but statistics come from all history
         if title_info:
             latest_time = None
             for source_titles in title_info.values():
@@ -1071,7 +1071,7 @@ def count_word_frequency(
                         if latest_time is None or last_time > latest_time:
                             latest_time = last_time
 
-            # 只处理 last_time 等于最新时间的新闻
+            # Only process news where last_time equals latest time
             if latest_time:
                 results_to_process = {}
                 for source_id, source_titles in results.items():
@@ -1129,7 +1129,7 @@ def count_word_frequency(
             if title in processed_titles.get(source_id, {}):
                 continue
 
-            # 使用统一的匹配逻辑
+            # Use unified matching logic
             matches_frequency_words = matches_word_groups(
                 title, word_groups, filter_words
             )
@@ -1137,7 +1137,7 @@ def count_word_frequency(
             if not matches_frequency_words:
                 continue
 
-            # 如果是增量模式或 current 模式第一次，统计匹配的新增新闻数量
+            # If incremental mode or current mode first time, count matching new news
             if (mode == "incremental" and all_news_are_new) or (
                 mode == "current" and is_first_today
             ):
@@ -1147,7 +1147,7 @@ def count_word_frequency(
             source_url = title_data.get("url", "")
             source_mobile_url = title_data.get("mobileUrl", "")
 
-            # 找到匹配的词组
+            # Find matching word group
             title_lower = title.lower()
             for group in word_groups:
                 required_words = group["required"]
@@ -1160,7 +1160,7 @@ def count_word_frequency(
                     if source_id not in word_stats[group_key]["titles"]:
                         word_stats[group_key]["titles"][source_id] = []
                 else:
-                    # 原有的匹配逻辑
+                    # Original matching logic
                     if required_words:
                         all_required_present = all(
                             req_word.lower() in title_lower
@@ -1189,7 +1189,7 @@ def count_word_frequency(
                 url = source_url
                 mobile_url = source_mobile_url
 
-                # 对于 current 模式，从历史统计信息中获取完整数据
+                # For current mode, get complete data from historical statistics
                 if (
                     mode == "current"
                     and title_info
@@ -1225,13 +1225,13 @@ def count_word_frequency(
 
                 source_name = id_to_name.get(source_id, source_id)
 
-                # 判断是否为新增
+                # Determine if newly added
                 is_new = False
                 if all_news_are_new:
-                    # 增量模式下所有处理的新闻都是新增，或者当天第一次的所有新闻都是新增
+                    # In incremental mode, all processed news is new, or all news on first time today is new
                     is_new = True
                 elif new_titles and source_id in new_titles:
-                    # 检查是否在新增列表中
+                    # Check if in new additions list
                     new_titles_for_source = new_titles[source_id]
                     is_new = title in new_titles_for_source
 
@@ -1257,7 +1257,7 @@ def count_word_frequency(
 
                 break
 
-    # 最后统一打印汇总信息
+    # Finally print unified summary information
     if mode == "incremental":
         if is_first_today:
             total_input_news = sum(len(titles) for titles in results.values())
@@ -1313,7 +1313,7 @@ def count_word_frequency(
         for source_id, title_list in data["titles"].items():
             all_titles.extend(title_list)
 
-        # 按权重排序
+        # Sort by weight
         sorted_titles = sorted(
             all_titles,
             key=lambda x: (
@@ -1340,7 +1340,7 @@ def count_word_frequency(
     return stats, total_titles
 
 
-# === 报告生成 ===
+# === Report Generation ===
 def prepare_report_data(
     stats: List[Dict],
     failed_ids: Optional[List] = None,
@@ -1348,13 +1348,13 @@ def prepare_report_data(
     id_to_name: Optional[Dict] = None,
     mode: str = "daily",
 ) -> Dict:
-    """准备报告数据"""
+    """Prepare report data"""
     processed_new_titles = []
 
-    # 在增量模式下隐藏新增新闻区域
+    # Hide new news section in incremental mode
     hide_new_section = mode == "incremental"
 
-    # 只有在非隐藏模式下才处理新增新闻部分
+    # Only process new news section when not in hidden mode
     if not hide_new_section:
         filtered_new_titles = {}
         if new_titles and id_to_name:
@@ -1441,7 +1441,7 @@ def prepare_report_data(
 def format_title_for_platform(
     platform: str, title_data: Dict, show_source: bool = True
 ) -> str:
-    """统一的标题格式化方法"""
+    """Unified title formatting method"""
     rank_display = format_rank_display(
         title_data["ranks"], title_data["rank_threshold"], platform
     )
@@ -1605,7 +1605,7 @@ def generate_html_report(
     is_daily_summary: bool = False,
     update_info: Optional[Dict] = None,
 ) -> str:
-    """生成HTML报告"""
+    """Generate HTML report"""
     if is_daily_summary:
         if mode == "current":
             filename = "Current Ranking.html"
@@ -1642,7 +1642,7 @@ def render_html_content(
     mode: str = "daily",
     update_info: Optional[Dict] = None,
 ) -> str:
-    """渲染HTML内容"""
+    """Render HTML content"""
     html = """
     <!DOCTYPE html>
     <html>
@@ -2087,7 +2087,7 @@ def render_html_content(
                         <span class="info-label">Report Type</span>
                         <span class="info-value">"""
 
-    # 处理报告类型显示
+    # Process report type display
     if is_daily_summary:
         if mode == "current":
             html += "Current Ranking"
@@ -2106,7 +2106,7 @@ def render_html_content(
 
     html += f"{total_titles} items"
 
-    # 计算筛选后的热点新闻数量
+    # Calculate filtered hot news count
     hot_news_count = sum(len(stat["titles"]) for stat in report_data["stats"])
 
     html += """</span>
@@ -2123,7 +2123,7 @@ def render_html_content(
                         <span class="info-label">Generated Time</span>
                         <span class="info-value">"""
 
-    now = get_beijing_time()
+    now = get_pacific_time()
     html += now.strftime("%m-%d %H:%M")
 
     html += """</span>
@@ -2133,7 +2133,7 @@ def render_html_content(
             
             <div class="content">"""
 
-    # 处理失败ID错误信息
+    # Process failed ID error information
     if report_data["failed_ids"]:
         html += """
                 <div class="error-section">
@@ -2145,14 +2145,14 @@ def render_html_content(
                     </ul>
                 </div>"""
 
-    # 处理主要统计数据
+    # Process main statistics data
     if report_data["stats"]:
         total_count = len(report_data["stats"])
 
         for i, stat in enumerate(report_data["stats"], 1):
             count = stat["count"]
 
-            # 确定热度等级
+            # Determine hotness level
             if count >= 10:
                 count_class = "hot"
             elif count >= 5:
@@ -2172,7 +2172,7 @@ def render_html_content(
                         <div class="word-index">{i}/{total_count}</div>
                     </div>"""
 
-            # 处理每个词组下的新闻标题，给每条新闻标上序号
+            # Process news titles under each word group, number each news item
             for j, title_data in enumerate(stat["titles"], 1):
                 is_new = title_data.get("is_new", False)
                 new_class = "new" if is_new else ""
@@ -2184,14 +2184,14 @@ def render_html_content(
                             <div class="news-header">
                                 <span class="source-name">{html_escape(title_data["source_name"])}</span>"""
 
-                # 处理排名显示
+                # Process rank display
                 ranks = title_data.get("ranks", [])
                 if ranks:
                     min_rank = min(ranks)
                     max_rank = max(ranks)
                     rank_threshold = title_data.get("rank_threshold", 10)
 
-                    # 确定排名等级
+                    # Determine rank level
                     if min_rank <= 3:
                         rank_class = "top"
                     elif min_rank <= rank_threshold:
@@ -2206,10 +2206,10 @@ def render_html_content(
 
                     html += f'<span class="rank-num {rank_class}">{rank_text}</span>'
 
-                # 处理时间显示
+                # Process time display
                 time_display = title_data.get("time_display", "")
                 if time_display:
-                    # 简化时间显示格式，将波浪线替换为~
+                    # Simplify time display format, replace wavy line with ~
                     simplified_time = (
                         time_display.replace(" ~ ", "~")
                         .replace("[", "")
@@ -2219,7 +2219,7 @@ def render_html_content(
                         f'<span class="time-info">{html_escape(simplified_time)}</span>'
                     )
 
-                # 处理出现次数
+                # Process occurrence count
                 count_info = title_data.get("count", 1)
                 if count_info > 1:
                     html += f'<span class="count-info">{count_info} times</span>'
@@ -2228,7 +2228,7 @@ def render_html_content(
                             </div>
                             <div class="news-title">"""
 
-                # 处理标题和链接
+                # Process title and link
                 escaped_title = html_escape(title_data["title"])
                 link_url = title_data.get("mobile_url") or title_data.get("url", "")
 
@@ -2246,7 +2246,7 @@ def render_html_content(
             html += """
                 </div>"""
 
-    # 处理新增新闻区域
+    # Process new news section
     if report_data["new_titles"]:
         html += f"""
                 <div class="new-section">
@@ -2260,11 +2260,11 @@ def render_html_content(
                     <div class="new-source-group">
                         <div class="new-source-title">{escaped_source} · {titles_count} items</div>"""
 
-            # 为新增新闻也添加序号
+            # Also add numbers for new news
             for idx, title_data in enumerate(source_data["titles"], 1):
                 ranks = title_data.get("ranks", [])
 
-                # 处理新增新闻的排名显示
+                # Process rank display for new news
                 rank_class = ""
                 if ranks:
                     min_rank = min(ranks)
@@ -2287,7 +2287,7 @@ def render_html_content(
                             <div class="new-item-content">
                                 <div class="new-item-title">"""
 
-                # 处理新增新闻的链接
+                # Process link for new news
                 escaped_title = html_escape(title_data["title"])
                 link_url = title_data.get("mobile_url") or title_data.get("url", "")
 
@@ -2720,7 +2720,7 @@ def render_feishu_content(
         for i, id_value in enumerate(report_data["failed_ids"], 1):
             text_content += f"  • <font color='red'>{id_value}</font>\n"
 
-    now = get_beijing_time()
+    now = get_pacific_time()
     text_content += (
         f"\n\n<font color='grey'>Updated: {now.strftime('%Y-%m-%d %H:%M:%S')}</font>"
     )
@@ -2740,7 +2740,7 @@ def render_dingtalk_content(
     total_titles = sum(
         len(stat["titles"]) for stat in report_data["stats"] if stat["count"] > 0
     )
-    now = get_beijing_time()
+    now = get_pacific_time()
 
     text_content += f"**Total News:** {total_titles}\n\n"
     text_content += f"**Time:** {now.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
@@ -2847,7 +2847,7 @@ def split_content_into_batches(
     total_titles = sum(
         len(stat["titles"]) for stat in report_data["stats"] if stat["count"] > 0
     )
-    now = get_beijing_time()
+    now = get_pacific_time()
 
     base_header = ""
     if format_type == "wework":
@@ -3118,9 +3118,9 @@ def split_content_into_batches(
         elif format_type == "ntfy":
             new_header = f"\n\n🆕 **New Hot Topics** (Total {report_data['total_new_count']} items)\n\n"
         elif format_type == "feishu":
-            new_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n🆕 **本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            new_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n🆕 **New Hot Topics** (Total {report_data['total_new_count']} items)\n\n"
         elif format_type == "dingtalk":
-            new_header = f"\n---\n\n🆕 **本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            new_header = f"\n---\n\n🆕 **New Hot Topics** (Total {report_data['total_new_count']} items)\n\n"
 
         test_content = current_batch + new_header
         if (
@@ -3240,15 +3240,15 @@ def split_content_into_batches(
     if report_data["failed_ids"]:
         failed_header = ""
         if format_type == "wework":
-            failed_header = f"\n\n\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n\n\n\n⚠️ **Platforms with failed data retrieval:**\n\n"
         elif format_type == "telegram":
-            failed_header = f"\n\n⚠️ 数据获取失败的平台：\n\n"
+            failed_header = f"\n\n⚠️ Platforms with failed data retrieval:\n\n"
         elif format_type == "ntfy":
-            failed_header = f"\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n\n⚠️ **Platforms with failed data retrieval:**\n\n"
         elif format_type == "feishu":
-            failed_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n⚠️ **Platforms with failed data retrieval:**\n\n"
         elif format_type == "dingtalk":
-            failed_header = f"\n---\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n---\n\n⚠️ **Platforms with failed data retrieval:**\n\n"
 
         test_content = current_batch + failed_header
         if (
@@ -3311,7 +3311,7 @@ def send_to_notifications(
         time_range_end = CONFIG["PUSH_WINDOW"]["TIME_RANGE"]["END"]
 
         if not push_manager.is_in_time_range(time_range_start, time_range_end):
-            now = get_beijing_time()
+            now = get_pacific_time()
             print(
                 f"Push window control: current time {now.strftime('%H:%M')} is not within push time window {time_range_start}-{time_range_end}, skipping push"
             )
@@ -3459,7 +3459,7 @@ def send_to_feishu(
         total_titles = sum(
             len(stat["titles"]) for stat in report_data["stats"] if stat["count"] > 0
         )
-        now = get_beijing_time()
+        now = get_pacific_time()
 
         payload = {
             "msg_type": "text",
@@ -3540,7 +3540,7 @@ def send_to_dingtalk(
             # 将批次标识插入到适当位置（在标题之后）
             if "📊 **Hot Keywords Statistics**" in batch_content:
                 batch_content = batch_content.replace(
-                    "📊 **热点词汇统计**\n\n", f"📊 **热点词汇统计** {batch_header}\n\n"
+                    "📊 **Hot Keywords Statistics**\n\n", f"📊 **Hot Keywords Statistics** {batch_header}\n\n"
                 )
             else:
                 # 如果没有统计标题，直接在开头添加
@@ -3776,7 +3776,7 @@ def send_to_email(
             msg["To"] = ", ".join(recipients)
 
         # 设置邮件主题
-        now = get_beijing_time()
+        now = get_pacific_time()
         subject = f"TrendRadar 热点分析报告 - {report_type} - {now.strftime('%m月%d日 %H:%M')}"
         msg["Subject"] = Header(subject, "utf-8")
 
@@ -4360,8 +4360,8 @@ class NewsAnalyzer:
 
     def _initialize_and_check_config(self) -> None:
         """通用初始化和配置检查"""
-        now = get_beijing_time()
-        print(f"Current Beijing time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+        now = get_pacific_time()
+        print(f"Current US Pacific time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
 
         if not CONFIG["ENABLE_CRAWLER"]:
             print("Crawler feature disabled (ENABLE_CRAWLER=False), program exiting")
