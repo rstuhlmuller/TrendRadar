@@ -277,9 +277,9 @@ class SystemManagementTools:
                         """确保目录存在"""
                         Path(directory).mkdir(parents=True, exist_ok=True)
 
-                    # 格式化日期和时间
-                    date_folder = now.strftime("%Y年%m月%d日")
-                    time_filename = now.strftime("%H时%M分")
+                    # Format date and time
+                    date_folder = now.strftime("%Y-%m-%d")
+                    time_filename = now.strftime("%H-%M")
 
                     # 创建 txt 文件路径
                     txt_dir = self.project_root / "output" / date_folder / "txt"

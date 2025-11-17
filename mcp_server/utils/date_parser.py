@@ -227,19 +227,19 @@ class DateParser:
     @staticmethod
     def format_date_folder(date: datetime) -> str:
         """
-        将日期格式化为文件夹名称
+        Format date as folder name
 
         Args:
-            date: datetime对象
+            date: datetime object
 
         Returns:
-            文件夹名称，格式: YYYY年MM月DD日
+            Folder name in format: YYYY-MM-DD
 
         Examples:
             >>> DateParser.format_date_folder(datetime(2025, 10, 11))
-            '2025年10月11日'
+            '2025-10-11'
         """
-        return date.strftime("%Y年%m月%d日")
+        return date.strftime("%Y-%m-%d")
 
     @staticmethod
     def validate_date_not_future(date: datetime) -> None:

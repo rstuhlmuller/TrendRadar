@@ -514,12 +514,13 @@ class DataService:
 
         available_dates = []
 
-        # 遍历日期文件夹
+        # Iterate through date folders
         for date_folder in output_dir.iterdir():
             if date_folder.is_dir() and not date_folder.name.startswith('.'):
-                # 解析日期（格式: YYYY年MM月DD日）
+                # Parse date (format: YYYY-MM-DD or YYYY年MM月DD日 for backward compatibility)
                 try:
-                    date_match = re.match(r'(\d{4})年(\d{2})月(\d{2})日', date_folder.name)
+                    # Try new format first: YYYY-MM-DD
+                    date_match = re.match(r'(\d{4})-(\d{2})-(\d{2})', date_folder.name)
                     if date_match:
                         folder_date = datetime(
                             int(date_match.group(1)),
@@ -527,6 +528,16 @@ class DataService:
                             int(date_match.group(3))
                         )
                         available_dates.append(folder_date)
+                    else:
+                        # Try old format: YYYY年MM月DD日
+                        date_match = re.match(r'(\d{4})年(\d{2})月(\d{2})日', date_folder.name)
+                        if date_match:
+                            folder_date = datetime(
+                                int(date_match.group(1)),
+                                int(date_match.group(2)),
+                                int(date_match.group(3))
+                            )
+                            available_dates.append(folder_date)
                 except Exception:
                     pass
 
@@ -554,22 +565,33 @@ class DataService:
             # 遍历日期文件夹
             for date_folder in output_dir.iterdir():
                 if date_folder.is_dir():
-                    # 解析日期
+                    # Parse date
                     try:
                         date_str = date_folder.name
-                        # 格式: YYYY年MM月DD日
-                        date_match = re.match(r'(\d{4})年(\d{2})月(\d{2})日', date_str)
+                        # Format: YYYY-MM-DD or YYYY年MM月DD日 for backward compatibility
+                        date_match = re.match(r'(\d{4})-(\d{2})-(\d{2})', date_str)
                         if date_match:
                             folder_date = datetime(
                                 int(date_match.group(1)),
                                 int(date_match.group(2)),
                                 int(date_match.group(3))
                             )
+                        else:
+                            # Try old format: YYYY年MM月DD日
+                            date_match = re.match(r'(\d{4})年(\d{2})月(\d{2})日', date_str)
+                            if date_match:
+                                folder_date = datetime(
+                                    int(date_match.group(1)),
+                                    int(date_match.group(2)),
+                                    int(date_match.group(3))
+                                )
+                            else:
+                                continue
 
-                            if oldest_record is None or folder_date < oldest_record:
-                                oldest_record = folder_date
-                            if latest_record is None or folder_date > latest_record:
-                                latest_record = folder_date
+                        if oldest_record is None or folder_date < oldest_record:
+                            oldest_record = folder_date
+                        if latest_record is None or folder_date > latest_record:
+                            latest_record = folder_date
 
                     except:
                         pass

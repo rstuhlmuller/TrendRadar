@@ -145,17 +145,17 @@ class ParserService:
 
     def get_date_folder_name(self, date: datetime = None) -> str:
         """
-        获取日期文件夹名称
+        Get date folder name
 
         Args:
-            date: 日期对象，默认为今天
+            date: Date object, defaults to today
 
         Returns:
-            文件夹名称，格式: YYYY年MM月DD日
+            Folder name in format: YYYY-MM-DD
         """
         if date is None:
             date = datetime.now()
-        return date.strftime("%Y年%m月%d日")
+        return date.strftime("%Y-%m-%d")
 
     def read_all_titles_for_date(
         self,
@@ -244,7 +244,7 @@ class ParserService:
 
             except Exception as e:
                 # 忽略单个文件的解析错误，继续处理其他文件
-                print(f"Warning: 解析文件 {txt_file} 失败: {e}")
+                print(f"Warning: Failed to parse file {txt_file}: {e}")
                 continue
 
         if not all_titles:

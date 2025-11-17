@@ -626,7 +626,7 @@ class SearchTools:
                     pass
                 except Exception as e:
                     # 记录错误但继续处理其他日期
-                    print(f"Warning: 处理日期 {current_date.strftime('%Y-%m-%d')} 时出错: {e}")
+                    print(f"Warning: Error processing date {current_date.strftime('%Y-%m-%d')}: {e}")
 
                 # 移动到下一天
                 current_date += timedelta(days=1)
