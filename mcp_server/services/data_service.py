@@ -255,8 +255,8 @@ class DataService:
 
         if not results:
             raise DataNotFoundError(
-                f"未找到包含关键词 '{keyword}' 的新闻",
-                suggestion="请尝试其他关键词或扩大日期范围"
+                f"No news found containing keyword '{keyword}'",
+                suggestion="Please try other keywords or expand the date range"
             )
 
         # 计算统计信息
@@ -314,8 +314,8 @@ class DataService:
 
         if not all_titles:
             raise DataNotFoundError(
-                "未找到今天的新闻数据",
-                suggestion="请确保爬虫已经运行并生成了数据"
+                "No news data found for today",
+                suggestion="Please ensure the crawler has run and generated data"
             )
 
         # 加载关键词配置
@@ -348,7 +348,7 @@ class DataService:
 
         else:
             raise ValueError(
-                f"不支持的模式: {mode}。支持的模式: daily, current"
+                f"Unsupported mode: {mode}. Supported modes: daily, current"
             )
 
         # 统计词频
@@ -403,10 +403,10 @@ class DataService:
     def _get_mode_description(self, mode: str) -> str:
         """获取模式描述"""
         descriptions = {
-            "daily": "当日累计统计",
-            "current": "最新一批统计"
+            "daily": "Daily cumulative statistics",
+            "current": "Latest batch statistics"
         }
-        return descriptions.get(mode, "未知模式")
+        return descriptions.get(mode, "Unknown mode")
 
     def get_current_config(self, section: str = "all") -> Dict:
         """

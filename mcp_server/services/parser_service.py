@@ -79,7 +79,7 @@ class ParserService:
                 sections = content.split("\n\n")
 
                 for section in sections:
-                    if not section.strip() or "==== 以下ID请求失败 ====" in section:
+                    if not section.strip() or "==== The following IDs failed ====" in section:
                         continue
 
                     lines = section.strip().split("\n")
@@ -199,8 +199,8 @@ class ParserService:
 
         if not txt_dir.exists():
             raise DataNotFoundError(
-                f"未找到 {date_folder} 的数据目录",
-                suggestion="请先运行爬虫或检查日期是否正确"
+                f"Data directory not found for {date_folder}",
+                suggestion="Please run the crawler first or check if the date is correct"
             )
 
         all_titles = {}
@@ -212,8 +212,8 @@ class ParserService:
 
         if not txt_files:
             raise DataNotFoundError(
-                f"{date_folder} 没有数据文件",
-                suggestion="请等待爬虫任务完成"
+                f"No data files found for {date_folder}",
+                suggestion="Please wait for the crawler task to complete"
             )
 
         for txt_file in txt_files:
@@ -249,8 +249,8 @@ class ParserService:
 
         if not all_titles:
             raise DataNotFoundError(
-                f"{date_folder} 没有有效的数据",
-                suggestion="请检查数据文件格式或重新运行爬虫"
+                f"No valid data found for {date_folder}",
+                suggestion="Please check the data file format or re-run the crawler"
             )
 
         # 缓存结果
