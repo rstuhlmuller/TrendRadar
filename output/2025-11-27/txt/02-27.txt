@@ -1,0 +1,13 @@
+==== The following IDs failed ====
+cnn
+bbc
+reuters
+nytimes
+washingtonpost
+npr
+abc-news
+cbs-news
+nbc-news
+fox-news
+usatoday
+theguardian
